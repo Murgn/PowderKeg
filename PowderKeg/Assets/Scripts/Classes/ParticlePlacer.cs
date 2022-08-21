@@ -7,10 +7,9 @@ namespace Murgn
 {
     public class ParticlePlacer : MonoBehaviour
     {
-        [SerializeField] private ParticleId selectedParticle;
+        [SerializeField] private Particle selectedParticle = ParticleTypes.Block;
         // 0 is 1 pixel
         [SerializeField] private float brushRadius = 10;
-        [SerializeField] private bool disperseBrush;
         private ParticleManager particleManager;
         private Vector2Int mousePos;
         private Camera mainCamera;
@@ -31,49 +30,32 @@ namespace Murgn
                 brushRadius++;
             if (Mouse.current.scroll.ReadValue().y < 0)
                 brushRadius--;
+
+            brushRadius = Mathf.Clamp(brushRadius, 0, 100);
             
             if (Mouse.current.leftButton.isPressed)
             {
                 int size = (int)brushRadius + 1;
-                switch (selectedParticle)
-                {
-                    // Particles that don't use dispersal
-                    case ParticleId.Block:
-                        for(int x=-size; x<size; x++)
-                        {
-                            for(int y=-size; y<size; y++)
-                            {
-                                if(x*x+y*y <= brushRadius*brushRadius)
-                                {
-                                    //inside or on the rim
-                                    particleManager.PlaceParticle(new Vector2Int(mousePos.x + x, mousePos.y + y),
-                                        selectedParticle);
-                                }
-                            }
-                        }
-                        break;
-                    
-                    // Particles that use dispersal
-                    default:
-                        for(int x=-size; x<size; x++)
-                        {
-                            for(int y=-size; y<size; y++)
-                            {
-                                if(x*x+y*y <= brushRadius*brushRadius)
-                                {
-                                    // Makes sand dispersal more random.
-                                    bool rand = Random.Range(0.0f, 1.0f) > 0.9f;
-                                    bool place = rand ? true : false;
 
-                                    if (place || !disperseBrush)
-                                        //inside or on the rim
-                                        particleManager.PlaceParticle(new Vector2Int(mousePos.x + x, mousePos.y + y),
-                                            selectedParticle);
-                                }
-                            }
+                for(int x=-size; x<size; x++)
+                {
+                    for(int y=-size; y<size; y++)
+                    {
+                        if(x*x+y*y <= brushRadius*brushRadius)
+                        {
+                            // Makes sand dispersal more random.
+                            bool rand = Random.Range(0.0f, 1.0f) > selectedParticle.dispersalChance;
+                            bool place = rand ? true : false;
+
+                            if (place)
+                                //inside or on the rim
+                                particleManager.PlaceParticle(new Vector2Int(mousePos.x + x, mousePos.y + y),
+                                    selectedParticle);
                         }
-                        break;
+                    }
                 }
+                
+                EventManager.Render?.Invoke();
             }
             else if (Mouse.current.rightButton.isPressed)
             {
@@ -85,22 +67,24 @@ namespace Murgn
                         if(x*x+y*y <= brushRadius*brushRadius)
                         {
                             //inside or on the rim
-                            particleManager.PlaceParticle(new Vector2Int(mousePos.x + x, mousePos.y + y), ParticleId.Air, true);
+                            particleManager.PlaceParticle(new Vector2Int(mousePos.x + x, mousePos.y + y),
+                                ParticleTypes.Air, true);
                         }
                     }
                 }
+                EventManager.Render?.Invoke();
             }
 
             if (Keyboard.current.digit1Key.wasPressedThisFrame)
-                selectedParticle = ParticleId.Block;
+                selectedParticle = ParticleTypes.Block;
             else if (Keyboard.current.digit2Key.wasPressedThisFrame)
-                selectedParticle = ParticleId.Dirt;
+                selectedParticle = ParticleTypes.Dirt;
             else if (Keyboard.current.digit3Key.wasPressedThisFrame)
-                selectedParticle = ParticleId.Sand;
+                selectedParticle = ParticleTypes.Sand;
             else if (Keyboard.current.digit4Key.wasPressedThisFrame)
-                selectedParticle = ParticleId.Water;
+                selectedParticle = ParticleTypes.Water;
             else if (Keyboard.current.digit5Key.wasPressedThisFrame)
-                selectedParticle = ParticleId.Steam;
+                selectedParticle = ParticleTypes.Steam;
         }
     }
 }

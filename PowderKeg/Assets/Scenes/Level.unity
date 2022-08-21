@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 457928703}
   - component: {fileID: 457928706}
   - component: {fileID: 457928707}
+  - component: {fileID: 457928708}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -155,8 +156,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8646b5739167df4da2ab5861400240b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilemap: {fileID: 1118137602}
-  tile: {fileID: 11400000, guid: a40f776c29f24c54fac2b93c8ec07571, type: 2}
 --- !u!114 &457928704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,7 +199,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9594e9cd8ceb4a42a13b50d8cb51ad4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectedParticle: 1
   brushRadius: 10
   disperseBrush: 1
 --- !u!114 &457928707
@@ -216,6 +214,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fpsText: {fileID: 1994103050}
+--- !u!114 &457928708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457928702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d99cf4ba86e14e028b2c72e92db5e429, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tilemap: {fileID: 1118137602}
+  tile: {fileID: 11400000, guid: a40f776c29f24c54fac2b93c8ec07571, type: 2}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

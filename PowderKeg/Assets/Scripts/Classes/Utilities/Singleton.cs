@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Murgn.Utilities
+namespace Murgn.Utils
 {
 	public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 	{

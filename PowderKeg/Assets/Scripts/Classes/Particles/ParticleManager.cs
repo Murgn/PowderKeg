@@ -1,6 +1,8 @@
 ﻿using System;
-using Murgn.Utilities;
+using Murgn.Utils;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 namespace Murgn
 {
@@ -16,6 +18,8 @@ namespace Murgn
         
         [Header("Logic")]
         [SerializeField] private float updateSpeed;
+        [SerializeField] private bool paused;
+        public int particleCount;
         private float updateTimer;
 
         private new void Awake()
@@ -37,7 +41,8 @@ namespace Murgn
         {
             if (updateTimer <= Time.time)
             {
-                EventManager.Update?.Invoke();
+                particleCount = 0;
+                if(!paused) EventManager.Update?.Invoke();
                 EventManager.Render?.Invoke();
                 
                 for (int y = 0; y < height; y++)
@@ -50,9 +55,11 @@ namespace Murgn
 
                 updateTimer = updateSpeed + Time.time;
             }
+
+            if (Keyboard.current.spaceKey.wasPressedThisFrame) paused = !paused;
         }
 
-        public bool PlaceParticle(Vector2Int position, Particle particle, bool unsafeMode = false)
+        public bool PlaceParticle(Vector2Int position, Particle particle, bool unsafeMode = false, bool changeColor = false)
         {
             // Checks if within map borders
             if (IsWithinMap(position))
@@ -61,7 +68,8 @@ namespace Murgn
                 if (map[position.x, position.y].id == ParticleId.Air || unsafeMode)
                 {
                     map[position.x, position.y] = particle;
-                    //Debug.Log($"Placed particle {particleId} at X: {position.x}, Y: {position.y}");
+                    float discolouration = map[position.x, position.y].discolouration;
+                    map[position.x, position.y].color = map[position.x, position.y].color + (changeColor ? new Color(Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration)) : Color.black);
                     return true;
                 }
             }
@@ -96,7 +104,9 @@ namespace Murgn
             return ParticleTypes.Null;
         }
         
+        public bool DestroyParticle(Vector2Int position) => PlaceParticle(position, ParticleTypes.Air, true);
+        
         public bool IsWithinMap(Vector2Int position) => 0 <= position.x && position.x <= width - 1 
-                                                     && 0 <= position.y && position.y <= height -1;
+                                                     && 0 <= position.y && position.y <= height - 1;
     }
 }

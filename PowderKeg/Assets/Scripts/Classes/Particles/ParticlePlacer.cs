@@ -98,6 +98,8 @@ namespace Murgn
                 selectedParticle = ParticleTypes.Fire;
             else if (Keyboard.current.digit7Key.wasPressedThisFrame)
                 selectedParticle = ParticleTypes.Wood;
+            else if (Keyboard.current.digit8Key.wasPressedThisFrame)
+                selectedParticle = ParticleTypes.Oil;
         }
 
         public void ChangeParticle(ParticleId particleId)
@@ -130,6 +132,10 @@ namespace Murgn
                 
                 case ParticleId.Wood:
                     selectedParticle = ParticleTypes.Wood;
+                    return;
+                
+                case ParticleId.Oil:
+                    selectedParticle = ParticleTypes.Oil;
                     return;
                 
                 default:

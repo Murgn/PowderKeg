@@ -12,5 +12,7 @@
         Steam = 6,
         Fire = 7,
         Wood = 8,
+        Oil = 9,
+        Smoke = 10,
     }
 }

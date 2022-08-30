@@ -96,7 +96,7 @@ namespace Murgn
             lifetime = -1,
             color = new Color(0.78f, 0.84f, 0.86f),
             // active = true,
-            weight = 0,
+            weight = 0.1f,
             dispersalChance = 0.9f,
             discolouration = 0.01f
         };
@@ -124,6 +124,31 @@ namespace Murgn
             dispersalChance = 0,
             discolouration = 0.005f,
             flammable = true
+        };
+        
+        public static readonly Particle Oil = new()
+        {
+            id = ParticleId.Oil,
+            state = ParticleState.Liquid,
+            lifetime = -1,
+            color = new Color(0.22f, 0.0f, 0.22f),
+            // active = true,
+            weight = 0.5f,
+            dispersalChance = 0.9f,
+            discolouration = 0.01f,
+            flammable = true
+        };
+        
+        public static readonly Particle Smoke = new()
+        {
+            id = ParticleId.Smoke,
+            state = ParticleState.Gas,
+            lifetime = -1,
+            color = new Color(0.18f, 0.2f, 0.2f),
+            // active = true,
+            weight = 0,
+            dispersalChance = 0.9f,
+            discolouration = 0.01f
         };
     }
 }

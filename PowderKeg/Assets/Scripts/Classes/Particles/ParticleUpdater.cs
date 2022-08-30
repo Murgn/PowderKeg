@@ -74,13 +74,15 @@ namespace Murgn
                                 break;
 
                             case ParticleId.Water:
-                                // Water Update
+                            case ParticleId.Oil:
+                                // Water & Oil Update
                                 WaterUpdate(position);
                                 particleManager.particleCount++;
                                 break;
 
                             case ParticleId.Steam:
-                                // Steam Update
+                            case ParticleId.Smoke:
+                                // Steam & Smoke Update
                                 SteamUpdate(position);
                                 particleManager.particleCount++;
                                 break;
@@ -92,7 +94,6 @@ namespace Murgn
                                 break;
                         }
                     }
-
                 }
             }
         }
@@ -147,7 +148,7 @@ namespace Murgn
             // If there is nothing above the cell, and something below the cell
             if (top && !bottom)
             {
-                particleManager.map[position.x, position.y].timer -= Utilities.RandomChance(25) ? 1 : 0;
+                particleManager.map[position.x, position.y].timer -= Utilities.RandomChance(50) ? 1 : 0;
             }
             else
                 particleManager.map[position.x, position.y].timer = 100;
@@ -260,7 +261,6 @@ namespace Murgn
                 particleManager.MoveParticle(position, rightDirection);
         }
         
-        // TODO: Have a timer decrease when more than 6 cells are steam too, when timer = 0, turn to water
         // TODO: Steam needs to swap with fire
         private void SteamUpdate(Vector2Int position)
         {
@@ -332,97 +332,191 @@ namespace Murgn
             if (top)
                 particleManager.MoveParticle(position, topDirection);
 
+            int smokeChance = 20;
+            
             // Set fire to flammable objects
             if (topLeftFlammable)
             {
                 particleManager.PlaceParticle(position + topLeftDirection, ParticleTypes.Fire, true, true);
                 particleManager.map[position.x + topLeftDirection.x, position.y + topLeftDirection.y].hasBeenUpdated = true;
+                
+                // Smoke
+                if (particleManager.IsWithinMap(position + bottomRightDirection) && Utilities.RandomChance(smokeChance))
+                {
+                    particleManager.PlaceParticle(position + bottomRightDirection, ParticleTypes.Smoke, true, true);
+                    particleManager.map[position.x + bottomRightDirection.x, position.y + bottomRightDirection.y].hasBeenUpdated = true;
+                }
             }
             else if (topFlammable)
             {
                 particleManager.PlaceParticle(position + topDirection, ParticleTypes.Fire, true, true);
                 particleManager.map[position.x + topDirection.x, position.y + topDirection.y].hasBeenUpdated = true;
+                
+                // Smoke
+                if (particleManager.IsWithinMap(position + bottomDirection) && Utilities.RandomChance(smokeChance))
+                {
+                    particleManager.PlaceParticle(position + bottomDirection, ParticleTypes.Smoke, true, true);
+                    particleManager.map[position.x + bottomDirection.x, position.y + bottomDirection.y].hasBeenUpdated = true;
+                }            
             }
             else if (topRightFlammable)
             {
                 particleManager.PlaceParticle(position + topRightDirection, ParticleTypes.Fire, true, true);
                 particleManager.map[position.x + topRightDirection.x, position.y + topRightDirection.y].hasBeenUpdated = true;
+                
+                // Smoke
+                if (particleManager.IsWithinMap(position + bottomLeftDirection) && Utilities.RandomChance(smokeChance))
+                {
+                    particleManager.PlaceParticle(position + bottomLeftDirection, ParticleTypes.Smoke, true, true);
+                    particleManager.map[position.x + bottomLeftDirection.x, position.y + bottomLeftDirection.y].hasBeenUpdated = true;
+                }            
             }
             else if (rightFlammable)
             {
                 particleManager.PlaceParticle(position + rightDirection, ParticleTypes.Fire, true, true);
                 particleManager.map[position.x + rightDirection.x, position.y + rightDirection.y].hasBeenUpdated = true;
+                
+                // Smoke
+                if (particleManager.IsWithinMap(position + leftDirection) && Utilities.RandomChance(smokeChance))
+
+                {
+                    particleManager.PlaceParticle(position + leftDirection, ParticleTypes.Smoke, true, true);
+                    particleManager.map[position.x + leftDirection.x, position.y + leftDirection.y].hasBeenUpdated = true;
+                }
             }
             else if (bottomRightFlammable)
             {
                 particleManager.PlaceParticle(position + bottomRightDirection, ParticleTypes.Fire, true, true);
                 particleManager.map[position.x + bottomRightDirection.x, position.y + bottomRightDirection.y].hasBeenUpdated = true;
+                
+                // Smoke
+                if (particleManager.IsWithinMap(position + topLeftDirection) && Utilities.RandomChance(smokeChance))
+                {
+                    particleManager.PlaceParticle(position + topLeftDirection, ParticleTypes.Smoke, true, true);
+                    particleManager.map[position.x + topLeftDirection.x, position.y + topLeftDirection.y].hasBeenUpdated = true;
+                }
             }
             else if (bottomFlammable)
             {
                 particleManager.PlaceParticle(position + bottomDirection, ParticleTypes.Fire, true, true);
                 particleManager.map[position.x + bottomDirection.x, position.y + bottomDirection.y].hasBeenUpdated = true;
+                
+                // Smoke
+                if (particleManager.IsWithinMap(position + topDirection) && Utilities.RandomChance(smokeChance))
+                {
+                    particleManager.PlaceParticle(position + topDirection, ParticleTypes.Smoke, true, true);
+                    particleManager.map[position.x + topDirection.x, position.y + topDirection.y].hasBeenUpdated = true;
+                }
             }
             else if (bottomLeftFlammable)
             {
                 particleManager.PlaceParticle(position + bottomLeftDirection, ParticleTypes.Fire, true, true);
                 particleManager.map[position.x + bottomLeftDirection.x, position.y + bottomLeftDirection.y].hasBeenUpdated = true;
+                
+                // Smoke
+                if (particleManager.IsWithinMap(position + topRightDirection) && Utilities.RandomChance(smokeChance))
+                {
+                    particleManager.PlaceParticle(position + topRightDirection, ParticleTypes.Smoke, true, true);
+                    particleManager.map[position.x + topRightDirection.x, position.y + topRightDirection.y].hasBeenUpdated = true;
+                }
             }
             else if (leftFlammable)
             {
                 particleManager.PlaceParticle(position + leftDirection, ParticleTypes.Fire, true, true);
                 particleManager.map[position.x + leftDirection.x, position.y + leftDirection.y].hasBeenUpdated = true;
+                
+                // Smoke
+                if (particleManager.IsWithinMap(position + rightDirection) && Utilities.RandomChance(smokeChance))
+                {
+                    particleManager.PlaceParticle(position + rightDirection, ParticleTypes.Smoke, true, true);
+                    particleManager.map[position.x + rightDirection.x, position.y + rightDirection.y].hasBeenUpdated = true;
+                }
             }
             
+            // Make this work for oil eventually
             // Fire + Water = steam
             if (topLeftCell.id == ParticleId.Water)
             {
                 particleManager.PlaceParticle(position + topLeftDirection, ParticleTypes.Steam, true, true);
                 particleManager.map[position.x + topLeftDirection.x, position.y + topLeftDirection.y].hasBeenUpdated = true;
-                Debug.Log("Steam");
             }
             else if (topCell.id == ParticleId.Water)
             {
                 particleManager.PlaceParticle(position + topDirection, ParticleTypes.Steam, true, true);
                 particleManager.map[position.x + topDirection.x, position.y + topDirection.y].hasBeenUpdated = true;
-                Debug.Log("Steam");
             }
             else if (topRightCell.id == ParticleId.Water)
             {
                 particleManager.PlaceParticle(position + topRightDirection, ParticleTypes.Steam, true, true);
                 particleManager.map[position.x + topRightDirection.x, position.y + topRightDirection.y].hasBeenUpdated = true;
-                Debug.Log("Steam");
             }
             else if (rightCell.id == ParticleId.Water)
             {
                 particleManager.PlaceParticle(position + rightDirection, ParticleTypes.Steam, true, true);
                 particleManager.map[position.x + rightDirection.x, position.y + rightDirection.y].hasBeenUpdated = true;
-                Debug.Log("Steam");
             }
             else if (bottomRightCell.id == ParticleId.Water)
             {
                 particleManager.PlaceParticle(position + bottomRightDirection, ParticleTypes.Steam, true, true);
                 particleManager.map[position.x + bottomRightDirection.x, position.y + bottomRightDirection.y].hasBeenUpdated = true;
-                Debug.Log("Steam");
             }
             else if (bottomCell.id == ParticleId.Water)
             {
                 particleManager.PlaceParticle(position + bottomDirection, ParticleTypes.Steam, true, true);
                 particleManager.map[position.x + bottomDirection.x, position.y + bottomDirection.y].hasBeenUpdated = true;
-                Debug.Log("Steam");
             }
             else if (bottomLeftCell.id == ParticleId.Water)
             {
                 particleManager.PlaceParticle(position + bottomLeftDirection, ParticleTypes.Steam, true, true);
                 particleManager.map[position.x + bottomLeftDirection.x, position.y + bottomLeftDirection.y].hasBeenUpdated = true;
-                Debug.Log("Steam");
             }
             else if (leftCell.id == ParticleId.Water)
             {
                 particleManager.PlaceParticle(position + leftDirection, ParticleTypes.Steam, true, true);
                 particleManager.map[position.x + leftDirection.x, position.y + leftDirection.y].hasBeenUpdated = true;
-                Debug.Log("Steam");
             }
+            
+            // // Fire + Oil = Smoke
+            // if (topLeftCell.id == ParticleId.Oil)
+            // {
+            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
+            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
+            // }
+            // else if (topCell.id == ParticleId.Oil)
+            // {
+            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
+            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
+            // }
+            // else if (topRightCell.id == ParticleId.Oil)
+            // {
+            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
+            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
+            // }
+            // else if (rightCell.id == ParticleId.Oil)
+            // {
+            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
+            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
+            // }
+            // else if (bottomRightCell.id == ParticleId.Oil)
+            // {
+            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
+            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
+            // }
+            // else if (bottomCell.id == ParticleId.Oil)
+            // {
+            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
+            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
+            // }
+            // else if (bottomLeftCell.id == ParticleId.Oil)
+            // {
+            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
+            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
+            // }
+            // else if (leftCell.id == ParticleId.Oil)
+            // {
+            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
+            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
+            // }
 
         }
     }   

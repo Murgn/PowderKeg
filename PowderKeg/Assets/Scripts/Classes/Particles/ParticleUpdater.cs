@@ -53,7 +53,11 @@ namespace Murgn
                         
                         switch (particleManager.map[x, y].id)
                         {
-                            // Static & empty objects don't need any logic
+                            // Empty objects don't need any logic
+                            case ParticleId.Stone:
+                            case ParticleId.Wood:
+                                particleManager.particleCount++;
+                                break;
 
                             case ParticleId.Dirt:
                                 // Dirt Update
@@ -77,6 +81,12 @@ namespace Murgn
                             case ParticleId.Oil:
                                 // Water & Oil Update
                                 WaterUpdate(position);
+                                particleManager.particleCount++;
+                                break;
+                            
+                            case ParticleId.Acid:
+                                // Acid Update
+                                AcidUpdate(position);
                                 particleManager.particleCount++;
                                 break;
 
@@ -106,7 +116,7 @@ namespace Murgn
             {
                 particleManager.DestroyParticle(position);
             }
-            else
+            else if(Utilities.RandomChance(50))
             {
                 particleManager.map[position.x, position.y].lifetime--;
             }
@@ -162,17 +172,19 @@ namespace Murgn
 
         private void GrassUpdate(Vector2Int position)
         {
-            ParticleState topCell = particleManager.GetParticle(position + topDirection).state;
-            ParticleState bottomCell = particleManager.GetParticle(position + bottomDirection).state;
+            Particle topLeftCell = particleManager.GetParticle(position + topLeftDirection);
+            Particle topCell = particleManager.GetParticle(position + topDirection);
+            Particle topRightCell = particleManager.GetParticle(position + topRightDirection);
+            Particle bottomCell = particleManager.GetParticle(position + bottomDirection);
 
-            bool top = topCell != ParticleState.Solid;
-            bool bottom = bottomCell != ParticleState.Solid;
+            bool top = topCell.state != ParticleState.Solid;
+            bool bottom = bottomCell.state != ParticleState.Solid;
 
             if (top)
                 particleManager.map[position.x, position.y].timer = 50;
             else
             {
-                particleManager.map[position.x, position.y].timer -= Utilities.RandomChance(10) ? 1 : 0;
+                particleManager.map[position.x, position.y].timer -= Utilities.RandomChance(50) ? 1 : 0;
             }
             
             if (particleManager.map[position.x, position.y].timer <= 0)
@@ -180,12 +192,15 @@ namespace Murgn
                 particleManager.PlaceParticle(position, ParticleTypes.Dirt, true, true);
             }
             
-            
             if (bottom)
                 particleManager.MoveParticle(position, bottomDirection);
+            
+            // Fire burns grass
+            if (topCell.id == ParticleId.Fire || topLeftCell.id == ParticleId.Fire || topRightCell.id == ParticleId.Fire)
+                particleManager.map[position.x, position.y].color = new Color(0.07f, 0.33f, 0.04f);
         }
 
-    private void SandUpdate(Vector2Int position)
+        private void SandUpdate(Vector2Int position)
         {
             ParticleId bottomCell = particleManager.GetParticle(position + bottomDirection).id;
             ParticleId bottomLeftCell = particleManager.GetParticle(position + bottomLeftDirection).id;
@@ -261,6 +276,67 @@ namespace Murgn
                 particleManager.MoveParticle(position, rightDirection);
         }
         
+        private void AcidUpdate(Vector2Int position)
+        {
+            Particle thisCell = particleManager.GetParticle(position);
+            Particle topLeftCell = particleManager.GetParticle(position + topLeftDirection);
+            Particle topCell = particleManager.GetParticle(position + topDirection);
+            Particle topRightCell = particleManager.GetParticle(position + topRightDirection);
+            Particle leftCell = particleManager.GetParticle(position + leftDirection);
+            Particle rightCell = particleManager.GetParticle(position + rightDirection);
+            Particle bottomCell = particleManager.GetParticle(position + bottomDirection);
+            Particle bottomLeftCell = particleManager.GetParticle(position + bottomLeftDirection);
+            Particle bottomRightCell = particleManager.GetParticle(position + bottomRightDirection);
+            
+            bool bottom = bottomCell.id == ParticleId.Air;
+            bool bottomLeft = bottomLeftCell.id == ParticleId.Air;
+            bool bottomRight = bottomRightCell.id == ParticleId.Air;
+            bool left = leftCell.id == ParticleId.Air;
+            bool right = rightCell.id == ParticleId.Air;
+
+            if (topCell.weight > thisCell.weight)
+                particleManager.SwapParticle(position, position + topDirection);
+
+            if (!bottom && !bottomLeft && !bottomRight)
+            {
+                bool rand = Utilities.RandomChance(50);
+                left = rand ? true : false;
+                right = rand ? false : true;
+            }
+            
+            // Dissolve surroundings
+            if(topLeftCell.id != ParticleId.Stone && topLeftCell.id != ParticleId.Acid)
+                particleManager.PlaceParticle(position + topLeftDirection, ParticleTypes.Air, true);
+            if(topCell.id != ParticleId.Stone && topCell.id != ParticleId.Acid)
+                particleManager.PlaceParticle(position + topDirection, ParticleTypes.Air, true);
+            if(topRightCell.id != ParticleId.Stone && topRightCell.id != ParticleId.Acid)
+                particleManager.PlaceParticle(position + topRightDirection, ParticleTypes.Air, true);
+            if(leftCell.id != ParticleId.Stone && leftCell.id != ParticleId.Acid)
+                particleManager.PlaceParticle(position + leftDirection, ParticleTypes.Air, true);
+            if(rightCell.id != ParticleId.Stone && rightCell.id != ParticleId.Acid)
+                particleManager.PlaceParticle(position + rightDirection, ParticleTypes.Air, true);
+            if(bottomCell.id != ParticleId.Stone && bottomCell.id != ParticleId.Acid)
+                particleManager.PlaceParticle(position + bottomDirection, ParticleTypes.Air, true);
+            if(bottomLeftCell.id != ParticleId.Stone && bottomLeftCell.id != ParticleId.Acid)
+                particleManager.PlaceParticle(position + bottomLeftDirection, ParticleTypes.Air, true);
+            if(bottomRightCell.id != ParticleId.Stone && bottomRightCell.id != ParticleId.Acid)
+                particleManager.PlaceParticle(position + bottomRightDirection, ParticleTypes.Air, true);
+            
+            // Move
+            if (bottom)
+                particleManager.MoveParticle(position, bottomDirection);
+            else if(bottomLeft)
+                particleManager.MoveParticle(position, bottomLeftDirection);
+            else if(bottomRight)
+                particleManager.MoveParticle(position, bottomRightDirection);
+            
+            if(left)
+                particleManager.MoveParticle(position, leftDirection);
+            else if(right)
+                particleManager.MoveParticle(position, rightDirection);
+
+        }
+        
         // TODO: Steam needs to swap with fire
         private void SteamUpdate(Vector2Int position)
         {
@@ -329,10 +405,53 @@ namespace Murgn
             bool bottomLeftFlammable = bottomLeftCell.flammable;
             bool leftFlammable = leftCell.flammable;
 
+            int nearbyFlames = 0;
+            
+            // Count nearby fire
+            if(topLeftCell.id == ParticleId.Fire) nearbyFlames++;
+            if(topCell.id == ParticleId.Fire) nearbyFlames++;
+            if(topRightCell.id == ParticleId.Fire) nearbyFlames++;
+            if(rightCell.id == ParticleId.Fire) nearbyFlames++;
+            if(bottomRightCell.id == ParticleId.Fire) nearbyFlames++;
+            if(bottomCell.id == ParticleId.Fire) nearbyFlames++;
+            if(bottomLeftCell.id == ParticleId.Fire) nearbyFlames++;
+            if(leftCell.id == ParticleId.Fire) nearbyFlames++;
+            
+            // Change color based on nearby fire
+            float discolouration = particleManager.map[position.x, position.y].discolouration;
+            switch (nearbyFlames)
+            {
+                default:
+                    particleManager.map[position.x, position.y].color = FireColors.red + new Color(Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration), 0);
+                    break;
+                
+                case 3:
+                case 4:
+                    particleManager.map[position.x, position.y].color = FireColors.orange + new Color(Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration), 0);
+                    break;
+                
+                case 5:
+                case 6:
+                    particleManager.map[position.x, position.y].color = FireColors.brightOrange + new Color(Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration), 0);
+                    break;
+                
+                case 7:
+                    particleManager.map[position.x, position.y].color = FireColors.yellow + new Color(Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration), 0);
+                    break;
+                
+                case 8:
+                    particleManager.map[position.x, position.y].color = FireColors.brightYellow + new Color(Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration), 0);
+                    break;
+            }
+            
             if (top)
                 particleManager.MoveParticle(position, topDirection);
 
             int smokeChance = 20;
+            bool useSmoke = Utilities.RandomChance(smokeChance);
+            
+            int waterChance = 50;
+            bool useWater = Utilities.RandomChance(waterChance);
             
             // Set fire to flammable objects
             if (topLeftFlammable)
@@ -341,7 +460,7 @@ namespace Murgn
                 particleManager.map[position.x + topLeftDirection.x, position.y + topLeftDirection.y].hasBeenUpdated = true;
                 
                 // Smoke
-                if (particleManager.IsWithinMap(position + bottomRightDirection) && Utilities.RandomChance(smokeChance))
+                if (particleManager.IsWithinMap(position + bottomRightDirection) && useSmoke)
                 {
                     particleManager.PlaceParticle(position + bottomRightDirection, ParticleTypes.Smoke, true, true);
                     particleManager.map[position.x + bottomRightDirection.x, position.y + bottomRightDirection.y].hasBeenUpdated = true;
@@ -353,7 +472,7 @@ namespace Murgn
                 particleManager.map[position.x + topDirection.x, position.y + topDirection.y].hasBeenUpdated = true;
                 
                 // Smoke
-                if (particleManager.IsWithinMap(position + bottomDirection) && Utilities.RandomChance(smokeChance))
+                if (particleManager.IsWithinMap(position + bottomDirection) && useSmoke)
                 {
                     particleManager.PlaceParticle(position + bottomDirection, ParticleTypes.Smoke, true, true);
                     particleManager.map[position.x + bottomDirection.x, position.y + bottomDirection.y].hasBeenUpdated = true;
@@ -365,7 +484,7 @@ namespace Murgn
                 particleManager.map[position.x + topRightDirection.x, position.y + topRightDirection.y].hasBeenUpdated = true;
                 
                 // Smoke
-                if (particleManager.IsWithinMap(position + bottomLeftDirection) && Utilities.RandomChance(smokeChance))
+                if (particleManager.IsWithinMap(position + bottomLeftDirection) && useSmoke)
                 {
                     particleManager.PlaceParticle(position + bottomLeftDirection, ParticleTypes.Smoke, true, true);
                     particleManager.map[position.x + bottomLeftDirection.x, position.y + bottomLeftDirection.y].hasBeenUpdated = true;
@@ -377,7 +496,7 @@ namespace Murgn
                 particleManager.map[position.x + rightDirection.x, position.y + rightDirection.y].hasBeenUpdated = true;
                 
                 // Smoke
-                if (particleManager.IsWithinMap(position + leftDirection) && Utilities.RandomChance(smokeChance))
+                if (particleManager.IsWithinMap(position + leftDirection) && useSmoke)
 
                 {
                     particleManager.PlaceParticle(position + leftDirection, ParticleTypes.Smoke, true, true);
@@ -390,7 +509,7 @@ namespace Murgn
                 particleManager.map[position.x + bottomRightDirection.x, position.y + bottomRightDirection.y].hasBeenUpdated = true;
                 
                 // Smoke
-                if (particleManager.IsWithinMap(position + topLeftDirection) && Utilities.RandomChance(smokeChance))
+                if (particleManager.IsWithinMap(position + topLeftDirection) && useSmoke)
                 {
                     particleManager.PlaceParticle(position + topLeftDirection, ParticleTypes.Smoke, true, true);
                     particleManager.map[position.x + topLeftDirection.x, position.y + topLeftDirection.y].hasBeenUpdated = true;
@@ -402,7 +521,7 @@ namespace Murgn
                 particleManager.map[position.x + bottomDirection.x, position.y + bottomDirection.y].hasBeenUpdated = true;
                 
                 // Smoke
-                if (particleManager.IsWithinMap(position + topDirection) && Utilities.RandomChance(smokeChance))
+                if (particleManager.IsWithinMap(position + topDirection) && useSmoke)
                 {
                     particleManager.PlaceParticle(position + topDirection, ParticleTypes.Smoke, true, true);
                     particleManager.map[position.x + topDirection.x, position.y + topDirection.y].hasBeenUpdated = true;
@@ -414,7 +533,7 @@ namespace Murgn
                 particleManager.map[position.x + bottomLeftDirection.x, position.y + bottomLeftDirection.y].hasBeenUpdated = true;
                 
                 // Smoke
-                if (particleManager.IsWithinMap(position + topRightDirection) && Utilities.RandomChance(smokeChance))
+                if (particleManager.IsWithinMap(position + topRightDirection) && useSmoke)
                 {
                     particleManager.PlaceParticle(position + topRightDirection, ParticleTypes.Smoke, true, true);
                     particleManager.map[position.x + topRightDirection.x, position.y + topRightDirection.y].hasBeenUpdated = true;
@@ -426,98 +545,54 @@ namespace Murgn
                 particleManager.map[position.x + leftDirection.x, position.y + leftDirection.y].hasBeenUpdated = true;
                 
                 // Smoke
-                if (particleManager.IsWithinMap(position + rightDirection) && Utilities.RandomChance(smokeChance))
+                if (particleManager.IsWithinMap(position + rightDirection) && useSmoke)
                 {
                     particleManager.PlaceParticle(position + rightDirection, ParticleTypes.Smoke, true, true);
                     particleManager.map[position.x + rightDirection.x, position.y + rightDirection.y].hasBeenUpdated = true;
                 }
             }
             
-            // Make this work for oil eventually
             // Fire + Water = steam
             if (topLeftCell.id == ParticleId.Water)
             {
-                particleManager.PlaceParticle(position + topLeftDirection, ParticleTypes.Steam, true, true);
+                particleManager.PlaceParticle(position + topLeftDirection, useWater ? ParticleTypes.Steam : ParticleTypes.Air, true, true);
                 particleManager.map[position.x + topLeftDirection.x, position.y + topLeftDirection.y].hasBeenUpdated = true;
             }
             else if (topCell.id == ParticleId.Water)
             {
-                particleManager.PlaceParticle(position + topDirection, ParticleTypes.Steam, true, true);
+                particleManager.PlaceParticle(position + topDirection, useWater ? ParticleTypes.Steam : ParticleTypes.Air, true, true);
                 particleManager.map[position.x + topDirection.x, position.y + topDirection.y].hasBeenUpdated = true;
             }
             else if (topRightCell.id == ParticleId.Water)
             {
-                particleManager.PlaceParticle(position + topRightDirection, ParticleTypes.Steam, true, true);
+                particleManager.PlaceParticle(position + topRightDirection, useWater ? ParticleTypes.Steam : ParticleTypes.Air, true, true);
                 particleManager.map[position.x + topRightDirection.x, position.y + topRightDirection.y].hasBeenUpdated = true;
             }
             else if (rightCell.id == ParticleId.Water)
             {
-                particleManager.PlaceParticle(position + rightDirection, ParticleTypes.Steam, true, true);
+                particleManager.PlaceParticle(position + rightDirection, useWater ? ParticleTypes.Steam : ParticleTypes.Air, true, true);
                 particleManager.map[position.x + rightDirection.x, position.y + rightDirection.y].hasBeenUpdated = true;
             }
             else if (bottomRightCell.id == ParticleId.Water)
             {
-                particleManager.PlaceParticle(position + bottomRightDirection, ParticleTypes.Steam, true, true);
+                particleManager.PlaceParticle(position + bottomRightDirection, useWater ? ParticleTypes.Steam : ParticleTypes.Air, true, true);
                 particleManager.map[position.x + bottomRightDirection.x, position.y + bottomRightDirection.y].hasBeenUpdated = true;
             }
             else if (bottomCell.id == ParticleId.Water)
             {
-                particleManager.PlaceParticle(position + bottomDirection, ParticleTypes.Steam, true, true);
+                particleManager.PlaceParticle(position + bottomDirection, useWater ? ParticleTypes.Steam : ParticleTypes.Air, true, true);
                 particleManager.map[position.x + bottomDirection.x, position.y + bottomDirection.y].hasBeenUpdated = true;
             }
             else if (bottomLeftCell.id == ParticleId.Water)
             {
-                particleManager.PlaceParticle(position + bottomLeftDirection, ParticleTypes.Steam, true, true);
+                particleManager.PlaceParticle(position + bottomLeftDirection, useWater ? ParticleTypes.Steam : ParticleTypes.Air, true, true);
                 particleManager.map[position.x + bottomLeftDirection.x, position.y + bottomLeftDirection.y].hasBeenUpdated = true;
             }
             else if (leftCell.id == ParticleId.Water)
             {
-                particleManager.PlaceParticle(position + leftDirection, ParticleTypes.Steam, true, true);
+                particleManager.PlaceParticle(position + leftDirection, useWater ? ParticleTypes.Steam : ParticleTypes.Air, true, true);
                 particleManager.map[position.x + leftDirection.x, position.y + leftDirection.y].hasBeenUpdated = true;
             }
-            
-            // // Fire + Oil = Smoke
-            // if (topLeftCell.id == ParticleId.Oil)
-            // {
-            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
-            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
-            // }
-            // else if (topCell.id == ParticleId.Oil)
-            // {
-            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
-            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
-            // }
-            // else if (topRightCell.id == ParticleId.Oil)
-            // {
-            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
-            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
-            // }
-            // else if (rightCell.id == ParticleId.Oil)
-            // {
-            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
-            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
-            // }
-            // else if (bottomRightCell.id == ParticleId.Oil)
-            // {
-            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
-            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
-            // }
-            // else if (bottomCell.id == ParticleId.Oil)
-            // {
-            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
-            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
-            // }
-            // else if (bottomLeftCell.id == ParticleId.Oil)
-            // {
-            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
-            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
-            // }
-            // else if (leftCell.id == ParticleId.Oil)
-            // {
-            //     particleManager.PlaceParticle(position, ParticleTypes.Smoke, false, true);
-            //     particleManager.map[position.x, position.y].hasBeenUpdated = true;
-            // }
-
         }
     }   
 }

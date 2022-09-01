@@ -1,4 +1,5 @@
 ﻿using System;
+using Classes;
 using Murgn.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,33 +13,45 @@ namespace Murgn
         [HideInInspector] public Vector2 minScreenPos;
         [SerializeField] private Particle selectedParticle = ParticleTypes.Stone;
         // 0 is 1 pixel
-        [SerializeField] private float brushRadius = 10;
+        public float brushRadius = 10;
+        [SerializeField] private Canvas canvas;
         private ParticleManager particleManager;
-        private Vector2Int mousePos;
+        private ParticleRenderer particleRenderer;
+        private Vector2Int flooredMousePos;
         private Camera mainCamera;
+        private RectTransform canvasRect;
+
+        private Vector2 arraySize;
+        private Vector2 rectangleSize;
+        private Vector2 relativePosition;
+
+        [SerializeField] private bool withinRect;
 
         private void Start()
         {
             particleManager = ParticleManager.instance;
+            particleRenderer = ParticleRenderer.instance;
             mainCamera = Camera.main;
+            canvasRect = canvas.GetComponent<RectTransform>();
         }
 
         private void Update()
         {
-            // I need to fix this at some point
-            Vector2 screenMousePos = mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue()) - (Vector3)particleManager.offset;
-            mousePos = new Vector2Int(Mathf.FloorToInt(screenMousePos.x),
-                                      Mathf.FloorToInt(screenMousePos.y));
+            UpdateImageTransformations();
+            Vector2 mousePos = new Vector2(relativePosition.x * arraySize.x / rectangleSize.x,
+                relativePosition.y * arraySize.y / rectangleSize.y);
+            
+            flooredMousePos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.y));
 
             if (Mouse.current.scroll.ReadValue().y > 0)
                 brushRadius++;
             if (Mouse.current.scroll.ReadValue().y < 0)
                 brushRadius--;
 
-            brushRadius = Mathf.Clamp(brushRadius, 0, 100);
+            brushRadius = Mathf.Clamp(brushRadius, 0, 99);
 
-            // If mousepos is within screenPos, this lets me disable drawing under the sidebar
-            if(minScreenPos.x <= screenMousePos.x && screenMousePos.x <= maxScreenPos.x && minScreenPos.y <= screenMousePos.y && screenMousePos.y <= maxScreenPos.y)
+
+            if (withinRect)
             {
                 if (Mouse.current.leftButton.isPressed)
                 {
@@ -56,7 +69,7 @@ namespace Murgn
 
                                 if (place || brushRadius <= 1)
                                     //inside or on the rim
-                                    particleManager.PlaceParticle(new Vector2Int(mousePos.x + x, mousePos.y + y),
+                                    particleManager.PlaceParticle(new Vector2Int(flooredMousePos.x + x, flooredMousePos.y + y),
                                         selectedParticle, false, true);
                             }
                         }
@@ -74,7 +87,7 @@ namespace Murgn
                             if (x * x + y * y <= brushRadius * brushRadius)
                             {
                                 //inside or on the rim
-                                particleManager.PlaceParticle(new Vector2Int(mousePos.x + x, mousePos.y + y),
+                                particleManager.PlaceParticle(new Vector2Int(flooredMousePos.x + x, flooredMousePos.y + y),
                                     ParticleTypes.Air, true);
                             }
                         }
@@ -82,24 +95,6 @@ namespace Murgn
                     //EventManager.Render?.Invoke();
                 }
             }
-
-            // Ill remove this eventually, its nice for debugging rn
-            if (Keyboard.current.digit1Key.wasPressedThisFrame)
-                selectedParticle = ParticleTypes.Stone;
-            else if (Keyboard.current.digit2Key.wasPressedThisFrame)
-                selectedParticle = ParticleTypes.Dirt;
-            else if (Keyboard.current.digit3Key.wasPressedThisFrame)
-                selectedParticle = ParticleTypes.Sand;
-            else if (Keyboard.current.digit4Key.wasPressedThisFrame)
-                selectedParticle = ParticleTypes.Water;
-            else if (Keyboard.current.digit5Key.wasPressedThisFrame)
-                selectedParticle = ParticleTypes.Steam;
-            else if (Keyboard.current.digit6Key.wasPressedThisFrame)
-                selectedParticle = ParticleTypes.Fire;
-            else if (Keyboard.current.digit7Key.wasPressedThisFrame)
-                selectedParticle = ParticleTypes.Wood;
-            else if (Keyboard.current.digit8Key.wasPressedThisFrame)
-                selectedParticle = ParticleTypes.Oil;
         }
 
         public void ChangeParticle(ParticleId particleId)
@@ -138,10 +133,35 @@ namespace Murgn
                     selectedParticle = ParticleTypes.Oil;
                     return;
                 
+                case ParticleId.Acid:
+                    selectedParticle = ParticleTypes.Acid;
+                    return;
+                
                 default:
                     Debug.LogError("Havent assigned the <b>ParticleId</b> to a <b>ParticleType</b> in the <b>ParticlePlacer</b>!");
                     return;
             }
+        }
+
+        private void UpdateImageTransformations()
+        {
+            arraySize = new Vector2(particleManager.width, particleManager.height);
+            
+            Vector2 rectanglePos = particleRenderer.image.rectTransform.position / canvas.scaleFactor;
+            rectangleSize = particleRenderer.image.rectTransform.sizeDelta;
+            
+            Vector2 mousePos = Mouse.current.position.ReadValue() / canvas.scaleFactor;
+            Vector2 offsettedMouse = mousePos - (new Vector2(-rectangleSize.x, -rectangleSize.y) / 2);
+            
+            // Check if mouse is within rect
+            if (rectanglePos.x - (rectangleSize.x / 2) <= mousePos.x && mousePos.x <= rectanglePos.x + (rectangleSize.x / 2) &&
+                rectanglePos.y - (rectangleSize.y / 2) <= mousePos.y && mousePos.y <= rectanglePos.y + (rectangleSize.y / 2))
+                withinRect = true;
+            else
+                withinRect = false;
+
+            // Position relative to rectangle
+            relativePosition = new Vector2(offsettedMouse.x - rectanglePos.x, offsettedMouse.y - rectanglePos.y);
         }
     }
 }

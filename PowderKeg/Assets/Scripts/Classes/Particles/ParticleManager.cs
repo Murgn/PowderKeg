@@ -14,19 +14,23 @@ namespace Murgn
         public int width;
         public int height;
 
-        public Vector2 offset;
+        public Vector2 mapOffset;
         
         [Header("Logic")]
         [SerializeField] private float updateSpeed;
-        [SerializeField] private bool paused;
+        public bool paused;
         public int particleCount;
+        public int maxParticleCount;
         private float updateTimer;
 
         private new void Awake()
         {
             base.Awake();
             map = new Particle[width, height];
-            offset = new Vector2(-width / 2.0f, -height / 2.0f);
+            mapOffset = new Vector2(-width / 2.0f, -height / 2.0f);
+            
+            // Disable debug updater
+            UnityEngine.Rendering.DebugManager.instance.enableRuntimeUI = false;
 
             for (int y = 0; y < height; y++)
             {
@@ -35,6 +39,8 @@ namespace Murgn
                     map[x, y] = ParticleTypes.Air;
                 }
             }
+
+            maxParticleCount = width * height;
         }
 
         private void Update()

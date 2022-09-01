@@ -20,7 +20,7 @@ namespace Murgn
             id = ParticleId.Air,
             state = ParticleState.Gas,
             lifetime = -1,
-            color = Color.black,
+            color = Color.white,
             // active = true,
             weight = 0,
             dispersalChance = 0
@@ -94,7 +94,7 @@ namespace Murgn
             id = ParticleId.Steam,
             state = ParticleState.Gas,
             lifetime = -1,
-            color = new Color(0.78f, 0.84f, 0.86f),
+            color = new Color(0.82f, 0.88f, 0.9f),
             // active = true,
             weight = 0.1f,
             dispersalChance = 0.9f,
@@ -106,11 +106,11 @@ namespace Murgn
             id = ParticleId.Fire,
             state = ParticleState.Plasma,
             lifetime = 10,
-            color = Color.red,
+            color = new Color(1f, 0.08f, 0.08f),
             // active = true,
-            weight = 0,
+            weight = 0.2f,
             dispersalChance = 0.925f,
-            discolouration = 0.01f
+            discolouration = 0.03f
         };
         
         public static readonly Particle Wood = new()
@@ -149,6 +149,18 @@ namespace Murgn
             weight = 0,
             dispersalChance = 0.9f,
             discolouration = 0.01f
+        };
+        
+        public static readonly Particle Acid = new()
+        {
+            id = ParticleId.Acid,
+            state = ParticleState.Liquid,
+            lifetime = -1,
+            color = new Color(0.12f, 0.86f, 0.18f),
+            // active = true,
+            weight = 99f,
+            dispersalChance = 0.8f,
+            discolouration = 0.02f,
         };
     }
 }

@@ -14,5 +14,6 @@
         Wood = 8,
         Oil = 9,
         Smoke = 10,
+        Acid = 11
     }
 }

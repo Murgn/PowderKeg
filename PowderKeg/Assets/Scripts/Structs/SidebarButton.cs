@@ -8,6 +8,7 @@ namespace Murgn
     public struct SidebarButton
     {
         public Button button;
+        public Image outline;
         public ParticleId particleId;
         public Color color;
     }

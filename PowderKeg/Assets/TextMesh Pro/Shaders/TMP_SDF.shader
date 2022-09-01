@@ -82,6 +82,12 @@ Properties {
 
 	_CullMode			("Cull Mode", Float) = 0
 	_ColorMask			("Color Mask", Float) = 15
+	
+	// Add properties
+	_DoodleMaxOffset("Doodle Max Offset", vector) = (0.005, 0.005, 0, 0)
+	_DoodleFrameTime("Doodle Frame Time", Float) = 0.05
+	_DoodleFrameCount("Doodle Frame Count", Int) = 12
+	_DoodleNoiseScale("Doodle Noise Scale", vector) = (2, 2, 1, 1)
 }
 
 SubShader {
@@ -122,10 +128,13 @@ SubShader {
 		#pragma multi_compile __ UNITY_UI_CLIP_RECT
 		#pragma multi_compile __ UNITY_UI_ALPHACLIP
 
+		#pragma multi_compile __ DOODLE_ON
+
 		#include "UnityCG.cginc"
 		#include "UnityUI.cginc"
 		#include "TMPro_Properties.cginc"
 		#include "TMPro.cginc"
+		//#include "Assets/Shader/UtilsCG.cginc"
 
 		struct vertex_t {
 			UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -157,6 +166,39 @@ SubShader {
 		// Used by Unity internally to handle Texture Tiling and Offset.
 		float4 _FaceTex_ST;
 		float4 _OutlineTex_ST;
+
+		// Doodle Shader (Im putting this here since for some reason it cant import UtilsCG.cginc
+		float random(float2 seed)
+		{
+		    return frac(sin(dot(seed.xy, float2(12.9898, 78.233))) * 43758.5453123);
+		}
+
+		float noise(float2 seed)
+		{
+		    float2 i = floor(seed);
+		    float2 f = frac(seed);
+
+		    float a = random(i);
+		    float b = random(i + float2(1.0f, 0.0f));
+		    float c = random(i + float2(0.0f, 1.0f));
+		    float d = random(i + float2(1.0f, 1.0f));
+
+		    float2 u = f * f * (3.0f - 2.0f * f);
+		    return lerp(a, b, u.x) + (c - a) * u.y * (1.0f - u.x) + (d - b) * u.x * u.y;
+		}
+
+		float2 DoodleTextureOffset(float2 textureCoords, float2 maxOffset, float time, float frameTime, int frameCount, float2 noiseScale)			
+		{
+		    float timeValue = (floor(time / frameTime) % frameCount) + 1; // get frame number
+
+		    float2 offset = 0.0;
+		    float2 coordsPlusTime = (textureCoords + timeValue);
+
+		    offset.x = (noise(coordsPlusTime * noiseScale.x) * 2.0 - 1.0) * maxOffset.x; // get an offset b/w -maxOffset and +maxOffset
+		    offset.y = (noise(coordsPlusTime * noiseScale.y) * 2.0 - 1.0) * maxOffset.y;
+
+		    return offset;				
+		}
 
 		pixel_t VertShader(vertex_t input)
 		{
@@ -233,11 +275,24 @@ SubShader {
 		}
 
 
+		// Add identifiers
+		float2 _DoodleMaxOffset;	// How far the UV can be distorted
+		float _DoodleFrameTime;		// How long does a frame last
+		int _DoodleFrameCount;		// How many frames per animation
+		float2 _DoodleNoiseScale;	// How noisy should the effect be
+
 		fixed4 PixShader(pixel_t input) : SV_Target
 		{
 			UNITY_SETUP_INSTANCE_ID(input);
 
-			float c = tex2D(_MainTex, input.atlas).a;
+			// Add doodle code
+			float2 uvOffset = 0.0;
+
+		#ifdef DOODLE_ON
+			uvOffset = DoodleTextureOffset(input.atlas, _DoodleMaxOffset, _Time.y, _DoodleFrameTime, _DoodleFrameCount, _DoodleNoiseScale);
+		#endif
+			
+		float c = tex2D(_MainTex, input.atlas + uvOffset).a;
 
 		#ifndef UNDERLAY_ON
 			clip(c - input.param.x);
@@ -281,12 +336,12 @@ SubShader {
 		#endif
 
 		#if UNDERLAY_ON
-			float d = tex2D(_MainTex, input.texcoord2.xy).a * input.texcoord2.z;
+			float d = tex2D(_MainTex, input.texcoord2.xy + uvOffset).a * input.texcoord2.z;
 			faceColor += input.underlayColor * saturate(d - input.texcoord2.w) * (1 - faceColor.a);
 		#endif
 
 		#if UNDERLAY_INNER
-			float d = tex2D(_MainTex, input.texcoord2.xy).a * input.texcoord2.z;
+			float d = tex2D(_MainTex, input.texcoord2.xy + uvOffset).a * input.texcoord2.z;
 			faceColor += input.underlayColor * (1 - saturate(d - input.texcoord2.w)) * saturate(1 - sd) * (1 - faceColor.a);
 		#endif
 

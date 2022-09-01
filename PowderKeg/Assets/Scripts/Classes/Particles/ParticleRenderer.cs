@@ -1,17 +1,18 @@
 ﻿using Murgn;
+using Murgn.Utils;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 namespace Classes
 {
-    public class ParticleRenderer : MonoBehaviour
+    public class ParticleRenderer : Singleton<ParticleRenderer>
     {
-        [SerializeField] private Image image;
+        public Image image;
+        public Color airColor;
 
         private Texture2D texture;
         private ParticleManager particleManager;
-        private Camera mainCamera;
 
         private void OnEnable()
         {
@@ -26,7 +27,6 @@ namespace Classes
         private void Start()
         {
             particleManager = ParticleManager.instance;
-            mainCamera = Camera.main;
             texture = new Texture2D(particleManager.width, particleManager.height);
             texture.filterMode = FilterMode.Point;
             texture.name = "Map";
@@ -45,7 +45,7 @@ namespace Classes
                     switch (particleManager.map[x, y].id)
                     {
                         case ParticleId.Air:
-                            texture.SetPixel(position.x, position.y, mainCamera.backgroundColor);
+                            texture.SetPixel(position.x, position.y, airColor);
                             break;
                         
                         default:

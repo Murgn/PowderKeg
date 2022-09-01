@@ -1,6 +1,27 @@
 # PowderKeg
  
-Planned Ideas: 
-* Another texture ontop of the map which is the lightmap, each particle has a light value that propogates to other pixels, whole map is black, light levels control opacity. 
-* Have a timer decrease when more than 6 cells are steam together, when timer = 0, turn to water
-* The more fire cells next to eachother, the brighter the fire
+Version Goals:
+* 0.5
+    * Flesh out existing elements
+    * Add more liquids and solids
+* 0.6
+    * Explosives
+    * More logic related elements, e.g. taps, clones
+* 0.7
+    * Create menus
+    * Allow for further sandbox customization
+* 0.8
+    * Save & load levels
+    * Save levels to image
+    * Save levels to gif
+    * Possibly online loading and saving? (this may be moved to post launch)
+* 0.9 - 1.0
+    * Contingency time
+    * Clean up code
+    * Finish any tasks
+    * Add player
+* 1.0
+    * Create promotional material
+    * Publish!
+
+[Planned Features](PLANS.MD)

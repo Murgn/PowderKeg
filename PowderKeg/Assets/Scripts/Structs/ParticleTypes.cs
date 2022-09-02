@@ -74,6 +74,18 @@ namespace Murgn
             weight = 2,
             dispersalChance = 0.7f,
             discolouration = 0.03f
+        };
+        
+        public static readonly Particle Glass = new()
+        {
+            id = ParticleId.Glass,
+            state = ParticleState.Solid,
+            lifetime = -1,
+            color = new Color(0.98f, 0.76f, 0.17f),
+            // active = true,
+            weight = 2,
+            dispersalChance = 0.7f,
+            discolouration = 0.03f
             
         };
         
@@ -98,7 +110,8 @@ namespace Murgn
             // active = true,
             weight = 0.1f,
             dispersalChance = 0.9f,
-            discolouration = 0.01f
+            discolouration = 0.01f,
+            timer = 15,
         };
         
         public static readonly Particle Fire = new()
@@ -160,6 +173,30 @@ namespace Murgn
             // active = true,
             weight = 99f,
             dispersalChance = 0.8f,
+            discolouration = 0.02f,
+        };
+        
+        public static readonly Particle AcidGas = new()
+        {
+            id = ParticleId.AcidGas,
+            state = ParticleState.Gas,
+            lifetime = -1,
+            color = new Color(0.54f, 0.86f, 0.61f),
+            // active = true,
+            weight = 0.05f,
+            dispersalChance = 0.9f,
+            discolouration = 0.01f
+        };
+
+        public static readonly Particle Lava = new()
+        {
+            id = ParticleId.Lava,
+            state = ParticleState.Liquid,
+            lifetime = -1,
+            color = new Color(0.98f, 0.42f, 0.11f),
+            // active = true,
+            weight = 99f,
+            dispersalChance = 0.7f,
             discolouration = 0.02f,
         };
     }

@@ -11,5 +11,6 @@ namespace Murgn
         public Image outline;
         public ParticleId particleId;
         public Color color;
+        public bool pressed;
     }
 }

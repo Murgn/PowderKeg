@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -10,6 +11,7 @@ namespace Murgn
     {
         [NonReorderable]
         [SerializeField] private SidebarButton[] sidebarButtons;
+        [HideInInspector] private List<ButtonImageSwap> buttonImageSwaps = new List<ButtonImageSwap>();
 
         [SerializeField] private Sprite normalButton;
         [SerializeField] private Sprite pressedButton;
@@ -27,6 +29,10 @@ namespace Murgn
                 // Have to pass i into a variable because by the time AddListener is called, its already been changed
                 int i2 = i;
                 sidebarButtons[i].button.image.color = sidebarButtons[i].color;
+                 
+                buttonImageSwaps.Add(sidebarButtons[i].button.GetComponent<ButtonImageSwap>());
+                buttonImageSwaps[i].thisSidebarButton = sidebarButtons[i];
+                
                 sidebarButtons[i2].button.onClick.AddListener(() => SetParticle(i2, sidebarButtons[i2].particleId));
             }
         }
@@ -37,10 +43,14 @@ namespace Murgn
             {
                 sidebarButtons[i2].button.image.sprite = normalButton;
                 sidebarButtons[i2].outline.sprite = normalButtonOutline;
+                sidebarButtons[i2].pressed = false;
+                buttonImageSwaps[i2].thisSidebarButton = sidebarButtons[i2];
             }
 
             sidebarButtons[i].button.image.sprite = pressedButton;
             sidebarButtons[i].outline.sprite = pressedButtonOutline;
+            sidebarButtons[i].pressed = true;
+            buttonImageSwaps[i].thisSidebarButton = sidebarButtons[i];
             particlePlacer.ChangeParticle(particleId);
         }
         

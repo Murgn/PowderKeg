@@ -14,6 +14,9 @@
         Wood = 8,
         Oil = 9,
         Smoke = 10,
-        Acid = 11
+        Acid = 11,
+        Glass = 12,
+        Lava = 13,
+        AcidGas = 14,
     }
 }

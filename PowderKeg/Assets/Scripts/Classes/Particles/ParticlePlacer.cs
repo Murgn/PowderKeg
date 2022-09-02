@@ -137,6 +137,10 @@ namespace Murgn
                     selectedParticle = ParticleTypes.Acid;
                     return;
                 
+                case ParticleId.Lava:
+                    selectedParticle = ParticleTypes.Lava;
+                    return;
+                
                 default:
                     Debug.LogError("Havent assigned the <b>ParticleId</b> to a <b>ParticleType</b> in the <b>ParticlePlacer</b>!");
                     return;

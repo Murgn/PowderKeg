@@ -23,5 +23,7 @@ Version Goals:
 * 1.0
     * Create promotional material
     * Publish!
+* 1.1+
+    * Temperature
 
 [Planned Features](PLANS.MD)

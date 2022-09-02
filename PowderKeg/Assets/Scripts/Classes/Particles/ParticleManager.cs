@@ -75,7 +75,7 @@ namespace Murgn
                 {
                     map[position.x, position.y] = particle;
                     float discolouration = map[position.x, position.y].discolouration;
-                    map[position.x, position.y].color = map[position.x, position.y].color + (changeColor ? new Color(Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration)) : Color.black);
+                    map[position.x, position.y].color += changeColor ? new Color(Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration)) : Color.black;
                     return true;
                 }
             }
@@ -102,13 +102,7 @@ namespace Murgn
             return PlaceParticle(otherPosition, particle, true);
         }
 
-        public Particle GetParticle(Vector2Int position)
-        {
-            if(IsWithinMap(position))
-                return map[position.x, position.y];
-
-            return ParticleTypes.Null;
-        }
+        public Particle GetParticle(Vector2Int position) => IsWithinMap(position) ? map[position.x, position.y] : ParticleTypes.Null;
         
         public bool DestroyParticle(Vector2Int position) => PlaceParticle(position, ParticleTypes.Air, true);
         

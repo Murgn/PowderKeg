@@ -11,6 +11,8 @@ namespace Murgn
     {
         [NonReorderable]
         [SerializeField] private SidebarButton[] sidebarButtons;
+        [SerializeField] private Button[] inspectButton;
+
         [HideInInspector] private List<ButtonImageSwap> buttonImageSwaps = new List<ButtonImageSwap>();
 
         [SerializeField] private Sprite normalButton;

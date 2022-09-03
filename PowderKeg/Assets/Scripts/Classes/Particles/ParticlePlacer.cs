@@ -97,55 +97,7 @@ namespace Murgn
             }
         }
 
-        public void ChangeParticle(ParticleId particleId)
-        {
-            switch (particleId)
-            {
-                case ParticleId.Stone:
-                    selectedParticle = ParticleTypes.Stone;
-                    return;
-                
-                case ParticleId.Dirt:
-                    selectedParticle = ParticleTypes.Dirt;
-                    return;
-                
-                case ParticleId.Sand:
-                    selectedParticle = ParticleTypes.Sand;
-                    return;
-                
-                case ParticleId.Water:
-                    selectedParticle = ParticleTypes.Water;
-                    return;
-                
-                case ParticleId.Steam:
-                    selectedParticle = ParticleTypes.Steam;
-                    return;
-                
-                case ParticleId.Fire:
-                    selectedParticle = ParticleTypes.Fire;
-                    return;
-                
-                case ParticleId.Wood:
-                    selectedParticle = ParticleTypes.Wood;
-                    return;
-                
-                case ParticleId.Oil:
-                    selectedParticle = ParticleTypes.Oil;
-                    return;
-                
-                case ParticleId.Acid:
-                    selectedParticle = ParticleTypes.Acid;
-                    return;
-                
-                case ParticleId.Lava:
-                    selectedParticle = ParticleTypes.Lava;
-                    return;
-                
-                default:
-                    Debug.LogError("Havent assigned the <b>ParticleId</b> to a <b>ParticleType</b> in the <b>ParticlePlacer</b>!");
-                    return;
-            }
-        }
+        public void ChangeParticle(ParticleId particleId) => selectedParticle = particleManager.particleIdLookup[particleId];
 
         private void UpdateImageTransformations()
         {

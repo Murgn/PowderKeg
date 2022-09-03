@@ -27,9 +27,11 @@ namespace Classes
         private void Start()
         {
             particleManager = ParticleManager.instance;
-            texture = new Texture2D(particleManager.width, particleManager.height);
-            texture.filterMode = FilterMode.Point;
-            texture.name = "Map";
+            texture = new Texture2D(particleManager.width, particleManager.height)
+            {
+                filterMode = FilterMode.Point,
+                name = "Map"
+            };
             image.material.mainTexture = texture;
             image.canvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(particleManager.width, particleManager.height);
         }

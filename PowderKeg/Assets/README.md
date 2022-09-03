@@ -1,15 +1,16 @@
 # PowderKeg
  
 Version Goals:
-* 0.5
+* 0.5 (Done!)
     * Flesh out existing elements
     * Add more liquids and solids
-* 0.6
+* 0.6 (Working On)
     * Explosives
     * More logic related elements, e.g. taps, clones
 * 0.7
     * Create menus
     * Allow for further sandbox customization
+    * Powder picker
 * 0.8
     * Save & load levels
     * Save levels to image
@@ -26,4 +27,4 @@ Version Goals:
 * 1.1+
     * Temperature
 
-[Planned Features](PLANS.MD)
+[Planned Features](PLANS.md)

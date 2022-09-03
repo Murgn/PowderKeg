@@ -8,12 +8,13 @@ namespace Murgn
         public ParticleState state;
         public int lifetime;
         public Color color;
-        // public bool active;
         public bool hasBeenUpdated;
         public float weight;
         public float dispersalChance;
         public int timer;
         public float discolouration;
         public bool flammable;
+        public ParticleId extraId;
+        public bool extraBool;
     }
 }

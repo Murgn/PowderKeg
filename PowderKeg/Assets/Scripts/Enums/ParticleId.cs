@@ -18,5 +18,13 @@
         Glass = 12,
         Lava = 13,
         AcidGas = 14,
+        Clone = 15,
+        Output = 16,
+        Void = 17,
+        Gunpowder = 18,
+        Grenade = 19,
+        Bomb = 20,
+        Seed = 21,
+        Plant = 22,
     }
 }

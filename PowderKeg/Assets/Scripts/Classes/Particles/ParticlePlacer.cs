@@ -9,8 +9,6 @@ namespace Murgn
 {
     public class ParticlePlacer : Singleton<ParticlePlacer>
     {
-        [HideInInspector] public Vector2 maxScreenPos;
-        [HideInInspector] public Vector2 minScreenPos;
         [SerializeField] private Particle selectedParticle = ParticleTypes.Stone;
         // 0 is 1 pixel
         public float brushRadius = 10;
@@ -18,21 +16,17 @@ namespace Murgn
         private ParticleManager particleManager;
         private ParticleRenderer particleRenderer;
         private Vector2Int flooredMousePos;
-        private Camera mainCamera;
-        private RectTransform canvasRect;
 
         private Vector2 arraySize;
         private Vector2 rectangleSize;
         private Vector2 relativePosition;
 
         [SerializeField] private bool withinRect;
-
+        
         private void Start()
         {
             particleManager = ParticleManager.instance;
             particleRenderer = ParticleRenderer.instance;
-            mainCamera = Camera.main;
-            canvasRect = canvas.GetComponent<RectTransform>();
         }
 
         private void Update()
@@ -97,7 +91,7 @@ namespace Murgn
             }
         }
 
-        public void ChangeParticle(ParticleId particleId) => selectedParticle = particleManager.particleIdLookup[particleId];
+        public void ChangeParticle(ParticleId particleId) => selectedParticle = ParticleLookup.IdToParticle[particleId];
 
         private void UpdateImageTransformations()
         {
@@ -118,6 +112,11 @@ namespace Murgn
 
             // Position relative to rectangle
             relativePosition = new Vector2(offsettedMouse.x - rectanglePos.x, offsettedMouse.y - rectanglePos.y);
+        }
+
+        public ParticleId GetMouseOverParticleId()
+        {
+            return particleManager.GetParticle(flooredMousePos).id;
         }
     }
 }

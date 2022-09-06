@@ -258,8 +258,8 @@ namespace Murgn
             lifetime = -1,
             color = new Color(0.94f, 0.88f, 0.71f),
             weight = 3,
-            dispersalChance = 0.99f,
-            timer = 10,
+            dispersalChance = 0.98f,
+            timer = 5,
             discolouration = 0.01f
         };
         
@@ -268,11 +268,12 @@ namespace Murgn
             id = ParticleId.Plant,
             state = ParticleState.Solid,
             lifetime = -1,
-            color = new Color(0.24f, 0.71f, 0.14f),
-            weight = 3,
-            dispersalChance = 0.99f,
-            timer = 10,
-            discolouration = 0.01f
+            color = new Color(0.12f, 0.88f, 0.1f),
+            weight = 0,
+            dispersalChance = 0.9f,
+            timer = 5,
+            discolouration = 0.02f,
+            flammable = true
         };
     }
 }

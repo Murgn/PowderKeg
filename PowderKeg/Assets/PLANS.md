@@ -1,12 +1,7 @@
 ﻿# Planned Features:
 
 ### Miscellaneous
-* Add explosives, e.g. gunpowder/bombs
 * If particle needs to move but theres an obstacle, if obstacles weighs less, swap places
-
-### v0.6
-* Bombs set fire
-* Grenades delete
 
 ### v0.7
 * Menu is 3 dots (...) at the bottom of the sidebar, when opened, it pauses the game.
@@ -20,7 +15,6 @@
 
 ### v0.9
 * Need to add a static ParticleState which prevents static objects from getting erased by acid/lava
+* Need to change acid color, its too similar to plant
 
 
-Seed:
-Water value, nearby water increase value every frame, if value is above a number, spawn a plant block, add our water value to plant block, when plant block water value is high enough, that grows another plant block.

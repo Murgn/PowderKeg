@@ -179,11 +179,6 @@ namespace Murgn
             if (particleManager.map[position.x, position.y].timer <= 0)
             {
                 particleManager.PlaceParticle(position, ParticleTypes.Grass, true, true);
-                float discolouration = particleManager.map[position.x, position.y].discolouration;
-                // Im dumb, dont need this, changeColor is set to true
-                // particleManager.map[position.x, position.y].color += new Color(
-                //     Random.Range(-discolouration, discolouration), Random.Range(-discolouration, discolouration),
-                //     Random.Range(-discolouration, discolouration));
             }
 
             if (bottom)
@@ -842,22 +837,22 @@ namespace Murgn
             {
                 case (1, _):
                     if (!top)
-                        particleManager.PlaceParticle(position + topDirection, particleManager.particleIdLookup[thisCell.extraId]);
+                        particleManager.PlaceParticle(position + topDirection, ParticleLookup.IdToParticle[thisCell.extraId]);
                     break;
                 
                 case (2, _):
                     if (!right)
-                        particleManager.PlaceParticle(position + rightDirection, particleManager.particleIdLookup[thisCell.extraId]);
+                        particleManager.PlaceParticle(position + rightDirection, ParticleLookup.IdToParticle[thisCell.extraId]);
                     break;
                 
                 case (3, _):
                     if (!left)
-                        particleManager.PlaceParticle(position + leftDirection, particleManager.particleIdLookup[thisCell.extraId]);
+                        particleManager.PlaceParticle(position + leftDirection, ParticleLookup.IdToParticle[thisCell.extraId]);
                     break;
                 
                 case (4, _):
                     if (!bottom)
-                        particleManager.PlaceParticle(position + bottomDirection, particleManager.particleIdLookup[thisCell.extraId]);
+                        particleManager.PlaceParticle(position + bottomDirection, ParticleLookup.IdToParticle[thisCell.extraId]);
                     break;
             }
 
@@ -874,7 +869,7 @@ namespace Murgn
             bool place = Utilities.RandomChance(25);
             
             if(bottom && place && top)
-                particleManager.PlaceParticle(position + bottomDirection, particleManager.particleIdLookup[topCell.id]);
+                particleManager.PlaceParticle(position + bottomDirection, ParticleLookup.IdToParticle[topCell.id]);
         }
         
         private void VoidUpdate(Vector2Int position)
@@ -995,6 +990,7 @@ namespace Murgn
                 }
             }
         }
+        
         private void SeedUpdate(Vector2Int position)
         {
             ParticleId topCell = particleManager.GetParticle(position + topDirection).id;
@@ -1007,72 +1003,56 @@ namespace Murgn
             if (top && !bottom)
                 particleManager.map[position.x, position.y].timer -= Utilities.RandomChance(50) ? 1 : 0;
             else
-                particleManager.map[position.x, position.y].timer = 10;
+                particleManager.map[position.x, position.y].timer = 5;
 
-            if (particleManager.map[position.x, position.y].timer <= 0 && top)
+            if (particleManager.map[position.x, position.y].timer <= 0 && top && !particleManager.map[position.x, position.y].extraBool)
             {
                 particleManager.PlaceParticle(position + topDirection, ParticleTypes.Plant, true, true);
+                particleManager.map[position.x, position.y].extraBool = true;
             }
 
             if (bottom)
                 particleManager.MoveParticle(position, bottomDirection);
+            
+            // Fire burns seeds
+            if (topCell == ParticleId.Fire)
+                particleManager.map[position.x, position.y].color = new Color(0.85f, 0.8f, 0.65f);
         }
         
         private void PlantUpdate(Vector2Int position)
         {
-            Particle topLeftCell = particleManager.GetParticle(position + topLeftDirection);
-            Particle topCell = particleManager.GetParticle(position + topDirection);
-            Particle topRightCell = particleManager.GetParticle(position + topRightDirection);
-            Particle rightCell = particleManager.GetParticle(position + rightDirection);
-            Particle bottomCell = particleManager.GetParticle(position + bottomDirection);
-            Particle leftCell = particleManager.GetParticle(position + leftDirection);
-            
-            bool top = topCell.id == ParticleId.Air;
-            // bool topLeft = topLeftCell.id == ParticleId.Air;
-            // bool topRight = topRightCell.id == ParticleId.Air;
-            // bool left = leftCell.id == ParticleId.Air;
-            // bool right = rightCell.id == ParticleId.Air;
-            bool bottom = bottomCell.id == ParticleId.Air;
-
-            // If there is nothing above the cell, and something below the cell
-            if (top && !bottom)
-                particleManager.map[position.x, position.y].timer -= Utilities.RandomChance(50) ? 1 : 0;
-            else
-                particleManager.map[position.x, position.y].timer = 10;
+            particleManager.map[position.x, position.y].timer -= Utilities.RandomChance(50) ? 1 : 0;
 
             if (particleManager.map[position.x, position.y].timer <= 0 && !particleManager.map[position.x, position.y].extraBool)
             {
-                // if (Utilities.RandomChance(10))
-                //     particleManager.map[position.x, position.y].extraBool = true;
-                
-                int direction = 0;
-                direction = Random.Range(1, 6);
+                const int disableChance = 90;
+                int direction = Random.Range(1, 6);
 
                 switch (direction)
                 {
                     case 1:
                         particleManager.PlaceParticle(position + topLeftDirection, ParticleTypes.Plant, false, true);
-                        particleManager.map[position.x, position.y].extraBool = true;
+                        particleManager.map[position.x, position.y].extraBool = Utilities.RandomChance(disableChance);
                         break;
                     
                     case 2:
                         particleManager.PlaceParticle(position + topDirection, ParticleTypes.Plant, false, true);
-                        particleManager.map[position.x, position.y].extraBool = true;
+                        particleManager.map[position.x, position.y].extraBool = Utilities.RandomChance(disableChance);
                         break;
                     
                     case 3:
                         particleManager.PlaceParticle(position + topRightDirection, ParticleTypes.Plant, false, true);
-                        particleManager.map[position.x, position.y].extraBool = true;
+                        particleManager.map[position.x, position.y].extraBool = Utilities.RandomChance(disableChance);
                         break;
                     
                     case 4:
                         particleManager.PlaceParticle(position + rightDirection, ParticleTypes.Plant, false, true);
-                        particleManager.map[position.x, position.y].extraBool = true;
+                        particleManager.map[position.x, position.y].extraBool = Utilities.RandomChance(disableChance);
                         break;
                     
                     case 5:
                         particleManager.PlaceParticle(position + leftDirection, ParticleTypes.Plant, false, true);
-                        particleManager.map[position.x, position.y].extraBool = true;
+                        particleManager.map[position.x, position.y].extraBool = Utilities.RandomChance(disableChance);
                         break;
                 }
             }

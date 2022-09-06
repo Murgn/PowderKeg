@@ -4,10 +4,10 @@ Version Goals:
 * 0.5 (Done!)
     * Flesh out existing elements
     * Add more liquids and solids
-* 0.6 (Working On)
+* 0.6 (Done!)
     * Explosives
     * More logic related elements, e.g. taps, clones
-* 0.7
+* 0.7 (Working On)
     * Create menus
     * Allow for further sandbox customization
     * Powder picker

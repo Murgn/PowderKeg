@@ -18,11 +18,13 @@ namespace Murgn
         public Vector2 mapOffset;
         
         [Header("Logic")]
-        [SerializeField] private float updateSpeed;
+        [NonReorderable] public UpdateSpeeds[] updateSpeed;
+        public int currentSpeed;
         public bool paused;
         public int particleCount;
         public int maxParticleCount;
         private float updateTimer;
+        public bool inMenu;
         private new void Awake()
         {
             base.Awake();
@@ -59,10 +61,11 @@ namespace Murgn
                     }
                 }
 
-                updateTimer = updateSpeed + Time.time;
+                updateTimer = updateSpeed[currentSpeed].updateSpeed + Time.time;
             }
 
-            if (Keyboard.current.spaceKey.wasPressedThisFrame) paused = !paused;
+            if (inMenu) paused = true;
+            if (Keyboard.current.spaceKey.wasPressedThisFrame && !inMenu) paused = !paused;
         }
 
         public bool PlaceParticle(Vector2Int position, Particle particle, bool unsafeMode = false, bool changeColor = false)
@@ -108,5 +111,16 @@ namespace Murgn
         
         public bool IsWithinMap(Vector2Int position) => 0 <= position.x && position.x <= width - 1 
                                                      && 0 <= position.y && position.y <= height - 1;
+
+        public void IncreaseSimulationSpeed(bool decrease = false)
+        {
+            if (decrease)
+                currentSpeed--;
+            else
+                currentSpeed++;
+
+            if (currentSpeed >= updateSpeed.Length) currentSpeed--;
+            if (currentSpeed < 0) currentSpeed++;
+        }
     }
 }

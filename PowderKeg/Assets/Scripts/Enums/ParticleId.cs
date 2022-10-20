@@ -1,5 +1,6 @@
 ﻿namespace Murgn
 {
+    [System.Serializable] 
     public enum ParticleId
     {
         Null = -1,

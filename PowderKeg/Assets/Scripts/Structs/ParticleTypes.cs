@@ -211,7 +211,7 @@ namespace Murgn
             id = ParticleId.Void,
             state = ParticleState.Solid,
             lifetime = -1,
-            color = new Color(0.09f, 0.03f, 0.1f),
+            color = new Color(0.11f, 0.11f, 0.11f),
             weight = 0,
             dispersalChance = 0,
             discolouration = 0.005f

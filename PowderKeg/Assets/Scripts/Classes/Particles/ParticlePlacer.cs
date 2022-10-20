@@ -1,5 +1,4 @@
 ﻿using System;
-using Classes;
 using Murgn.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,8 +12,6 @@ namespace Murgn
         // 0 is 1 pixel
         public float brushRadius = 10;
         [SerializeField] private Canvas canvas;
-        private ParticleManager particleManager;
-        private ParticleRenderer particleRenderer;
         private Vector2Int flooredMousePos;
 
         private Vector2 arraySize;
@@ -22,11 +19,16 @@ namespace Murgn
         private Vector2 relativePosition;
 
         [SerializeField] private bool withinRect;
+
+        private ParticleManager particleManager;
+        private ParticleRenderer particleRenderer;
+        private UIManager uiManager;
         
         private void Start()
         {
             particleManager = ParticleManager.instance;
             particleRenderer = ParticleRenderer.instance;
+            uiManager = UIManager.instance;
         }
 
         private void Update()
@@ -44,8 +46,11 @@ namespace Murgn
 
             brushRadius = Mathf.Clamp(brushRadius, 0, 99);
 
-
-            if (withinRect)
+            if (withinRect && Mouse.current.middleButton.wasPressedThisFrame)
+                uiManager.ClickSidebarButton(GetMouseOverParticleId());
+            
+            
+            if (withinRect && !uiManager.inspectMode && !uiManager.inMenu)
             {
                 if (Mouse.current.leftButton.isPressed)
                 {
@@ -114,9 +119,6 @@ namespace Murgn
             relativePosition = new Vector2(offsettedMouse.x - rectanglePos.x, offsettedMouse.y - rectanglePos.y);
         }
 
-        public ParticleId GetMouseOverParticleId()
-        {
-            return particleManager.GetParticle(flooredMousePos).id;
-        }
+        public ParticleId GetMouseOverParticleId() => particleManager.GetParticle(flooredMousePos).id;
     }
 }

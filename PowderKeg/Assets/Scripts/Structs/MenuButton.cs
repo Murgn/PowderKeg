@@ -12,6 +12,8 @@ namespace Murgn
         public Button button;
         public Image outline;
         public TextMeshProUGUI text;
+        [HideInInspector] public Vector2 textStartPosition;
         public Vector2 textClickedPosition;
+        public bool pressed;
     }
 }

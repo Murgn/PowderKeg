@@ -2,6 +2,7 @@
 
 namespace Murgn
 {
+    [System.Serializable] 
     public struct Particle
     {
         public ParticleId id;

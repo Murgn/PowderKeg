@@ -14,7 +14,9 @@
 * Gifs save each update frame into a gif.
 
 ### v0.9
+* if clone is above another clone, propogate the clones clone value down to the clone below
 * Need to add a static ParticleState which prevents static objects from getting erased by acid/lava
 * Need to change acid color, its too similar to plant
+* Optimize renderer
 
 

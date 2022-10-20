@@ -11,7 +11,7 @@ Version Goals:
     * Create menus
     * Allow for further sandbox customization
     * Powder picker
-* 0.8
+* 0.8 (Working On)
     * Save & load levels
     * Save levels to image
     * Save levels to gif
@@ -21,6 +21,8 @@ Version Goals:
     * Clean up code
     * Finish any tasks
     * Add player
+    * Options serialization
+    * Discord Integration
 * 1.0
     * Create promotional material
     * Publish!

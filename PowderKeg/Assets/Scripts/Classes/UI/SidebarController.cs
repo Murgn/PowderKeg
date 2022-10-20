@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.UI;
+
 
 namespace Murgn
 {
@@ -11,9 +8,8 @@ namespace Murgn
     {
         [NonReorderable]
         [SerializeField] private SidebarButton[] sidebarButtons;
-        [SerializeField] private Button[] inspectButton;
 
-        [HideInInspector] private List<ButtonImageSwap> buttonImageSwaps = new List<ButtonImageSwap>();
+        private List<ButtonImageSwap> buttonImageSwaps = new();
 
         [SerializeField] private Sprite normalButton;
         [SerializeField] private Sprite pressedButton;
@@ -21,10 +17,12 @@ namespace Murgn
         [SerializeField] private Sprite pressedButtonOutline;
         
         private ParticlePlacer particlePlacer;
+        private UIManager uiManager;
 
         private void Start()
         {
             particlePlacer = ParticlePlacer.instance;
+            uiManager = UIManager.instance;
 
             for (int i = 0; i < sidebarButtons.Length; i++)
             {
@@ -36,6 +34,7 @@ namespace Murgn
                 buttonImageSwaps[i].thisSidebarButton = sidebarButtons[i];
                 
                 sidebarButtons[i2].button.onClick.AddListener(() => SetParticle(i2, sidebarButtons[i2].particleId));
+                sidebarButtons[i2].button.onClick.AddListener(() => uiManager.ResetButtons());
             }
         }
 
@@ -54,6 +53,26 @@ namespace Murgn
             sidebarButtons[i].pressed = true;
             buttonImageSwaps[i].thisSidebarButton = sidebarButtons[i];
             particlePlacer.ChangeParticle(particleId);
+        }
+
+        public void ClickButton(ParticleId particleId)
+        {
+            for (int i = 0; i < sidebarButtons.Length; i++)
+            {
+                if(sidebarButtons[i].particleId == particleId)
+                    sidebarButtons[i].button.onClick.Invoke();
+            }
+        }
+
+        public void ResetButtons()
+        {
+            for (int i = 0; i < sidebarButtons.Length; i++)
+            {
+                sidebarButtons[i].button.image.sprite = normalButton;
+                sidebarButtons[i].outline.sprite = normalButtonOutline;
+                sidebarButtons[i].pressed = false;
+                buttonImageSwaps[i].thisSidebarButton = sidebarButtons[i];
+            }
         }
         
     }   

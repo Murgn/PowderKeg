@@ -1,17 +1,15 @@
-﻿using Murgn;
-using Murgn.Utils;
+﻿using Murgn.Utils;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
-namespace Classes
+namespace Murgn
 {
     public class ParticleRenderer : Singleton<ParticleRenderer>
     {
         public Image image;
         public Color airColor;
-
-        private Texture2D texture;
+        public Texture2D texture;
+        
         private ParticleManager particleManager;
 
         private void OnEnable()

@@ -3,6 +3,7 @@
     public enum MenuButtonType
     {
         Inspect,
-        Menu
+        Menu,
+        Back,
     }
 }

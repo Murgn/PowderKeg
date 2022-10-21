@@ -3,12 +3,6 @@
 ### Miscellaneous
 * If particle needs to move but theres an obstacle, if obstacles weighs less, swap places
 
-### v0.7
-* Menu is 3 dots (...) at the bottom of the sidebar, when opened, it pauses the game.
-* Menu contains customizations such as background color, update speed.
-* Menu also contains options to save as image or gifs.
-* A question mark button near the bottom right, once clicked, mouse over any element or button and it will replace the PowderKeg title with the name of the element.
-
 ### v0.8
 * Images save the current rendered frame into a png
 * Gifs save each update frame into a gif.

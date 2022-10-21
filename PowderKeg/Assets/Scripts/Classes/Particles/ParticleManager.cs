@@ -11,6 +11,8 @@ namespace Murgn
     {
         [Header("Map")]
         public Particle[,] map;
+
+        public MapSize mapSize;
         
         public int width;
         public int height;
@@ -28,6 +30,7 @@ namespace Murgn
         private new void Awake()
         {
             base.Awake();
+            SetMapSize();
             map = new Particle[width, height];
             mapOffset = new Vector2(-width / 2.0f, -height / 2.0f);
             
@@ -43,6 +46,7 @@ namespace Murgn
             }
 
             maxParticleCount = width * height;
+
         }
 
         private void Update()
@@ -66,6 +70,8 @@ namespace Murgn
 
             if (inMenu) paused = true;
             if (Keyboard.current.spaceKey.wasPressedThisFrame && !inMenu) paused = !paused;
+            
+            
         }
 
         public bool PlaceParticle(Vector2Int position, Particle particle, bool unsafeMode = false, bool changeColor = false)
@@ -121,6 +127,30 @@ namespace Murgn
 
             if (currentSpeed >= updateSpeed.Length) currentSpeed--;
             if (currentSpeed < 0) currentSpeed++;
+        }
+
+        public void Pause(bool pause) => paused = pause;
+
+        private void SetMapSize()
+        {
+            // Set Map Size
+            switch (mapSize)
+            {
+                case MapSize.Small:
+                    width = 160;
+                    height = 90;
+                    break;
+                
+                case MapSize.Medium:
+                    width = 240;
+                    height = 135;
+                    break;
+                
+                case MapSize.Large:
+                    width = 320;
+                    height = 180;
+                    break;
+            }
         }
     }
 }

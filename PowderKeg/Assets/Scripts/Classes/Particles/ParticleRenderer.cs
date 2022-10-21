@@ -31,7 +31,7 @@ namespace Murgn
                 name = "Map"
             };
             image.material.mainTexture = texture;
-            image.canvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(particleManager.width, particleManager.height);
+            //image.canvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(particleManager.width, particleManager.height);
         }
         
         // Update to do particle renderering

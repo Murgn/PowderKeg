@@ -50,7 +50,7 @@ namespace Murgn
                 uiManager.ClickSidebarButton(GetMouseOverParticleId());
             
             
-            if (withinRect && !uiManager.inspectMode && !uiManager.inMenu)
+            if (withinRect && !uiManager.inspectMode && !particleManager.inMenu)
             {
                 if (Mouse.current.leftButton.isPressed)
                 {

@@ -2,116 +2,77 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Murgn.OdinSerializer;
 using UnityEngine.InputSystem;
 
 namespace Murgn.Data
 {
+    // TODO: Need to add map settings to MapData.cs
     public class DataManager : MonoBehaviour
     {
         private string dataDirPath = "";
         public string dataFileName = "";
         public string dataFileExtension = ".powderkeg";
 
-        private bool useEncryption;
-        private const string encryptionCode = "MURGN_SAYS_GO_AWAY!";
-
+        private const DataFormat dataFormat = DataFormat.Binary;
+        
         private void Start() => dataDirPath = Application.persistentDataPath;
 
         private void Update()
         {
             if (Keyboard.current.sKey.wasPressedThisFrame)
             {
-                MapData map = new MapData("defaultMap", ParticleManager.instance.map);
+                MapData map = new MapData(dataFileName, ParticleManager.instance.map, ParticleManager.instance.mapSize);
                 Save(map);
+            }
+            
+            if (Keyboard.current.lKey.wasPressedThisFrame)
+            {
+                Load(dataFileName);
             }
         }
         
-        public void Load()
+        public void Load(string mapName)
         {
             // Use Path.Combine to account for different OS's having different path seperators
-            string fullPath = Path.Combine(dataDirPath, dataFileName);
-            
-            MapData loadedData = null;
+            string directory = string.Format("{0}/Saves/", dataDirPath);
+            string fullPath = Path.Combine(directory, mapName + dataFileExtension);
             
             if (File.Exists(fullPath))
             {
                 try
                 {
-                    // Load the serialized data from the file
-                    string dataToLoad = "";
-                    using (FileStream stream = new FileStream(fullPath, FileMode.Open))
-                    {
-                        using (StreamReader reader = new StreamReader(stream))
-                        {
-                            dataToLoad = reader.ReadToEnd();
-                        }
-                    }
+                    byte[] bytes = File.ReadAllBytes(fullPath);
                     
-                    // Decrypt data if using encryption
-                    if (useEncryption)
-                    {
-                        dataToLoad = EncryptDecrypt(dataToLoad);
-                    }
-                    
-                    // Deserialize the data from json back into the C# object
-                    loadedData = JsonUtility.FromJson<MapData>(dataToLoad);
+                    MapData loadedData = SerializationUtility.DeserializeValue<MapData>(bytes, dataFormat);
+                    Debug.Log("Loaded map: " + loadedData.mapName);
+                    ParticleManager.instance.map = loadedData.map;
                 }
                 catch (Exception e)
                 {
                     Debug.LogError("Error occured when trying to load data from file: " + fullPath + "\n" + e);
                 }
             }
-
-            //return loadedData;
         }
 
         private void Save(MapData data)
         {
             // Use Path.Combine to account for different OS's having different path seperators
-            string fullPath = Path.Combine(dataDirPath, data.mapName + dataFileExtension);
+            string directory = string.Format("{0}/Saves/", dataDirPath);
+            string fullPath = Path.Combine(directory, data.mapName + dataFileExtension);
             try
             {
                 // Create the directory the file will be written to if it doesn't already exist
                 Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
                 
                 // Serialize the C# game data object into json
-                string dataToStore = string.Empty;
-
-                for (int y = 0; y < ParticleManager.instance.height; y++)
-                {
-                    for (int x = 0; x < ParticleManager.instance.width; x++)
-                    {
-                        dataToStore += JsonUtility.ToJson(ParticleManager.instance.map[x, y], true);
-                    }
-                }
-                
-                // Encrypt data if using encryption
-                if (useEncryption)
-                {
-                    dataToStore = EncryptDecrypt(dataToStore);
-                }
-                
-                // write the serialized data to the file
-                using FileStream stream = new FileStream(fullPath, FileMode.Create);
-                using StreamWriter writer = new StreamWriter(stream);
-                
-                writer.Write(dataToStore);
+                byte[] bytes = SerializationUtility.SerializeValue(data, dataFormat);
+                File.WriteAllBytes(fullPath, bytes);
             }
             catch (Exception e)
             {
                 Debug.LogError("Error occured when trying to save data to file: " + fullPath + "\n" + e);
             }
-        }
-
-        // XOR Encryption
-        private string EncryptDecrypt(string data)
-        {
-            string modifiedData = "";
-            for (int i = 0; i < data.Length; i++)
-            {
-                modifiedData += (char)(data[i] ^ encryptionCode[i % encryptionCode.Length]);
-            }
-            return modifiedData;
         }
     }   
 }

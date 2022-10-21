@@ -44,9 +44,6 @@ namespace Murgn
         private const string defaultTitle = "Powder<color=#464B53>Keg";
         [HideInInspector] public string mouseOverButton;
         
-        // Menu Button
-        [HideInInspector] public bool inMenu;
-
         [Header("Options")] 
         [SerializeField] private TMP_Dropdown backgroundDropdown;
         [NonReorderable] [SerializeField] private BackgroundColor[] backgroundColors;
@@ -78,8 +75,6 @@ namespace Murgn
             CursorUpdate();
             InspectUpdate();
             SimulationSpeedUpdate();
-
-            particleManager.inMenu = inMenu;
         }
 
         private void CursorUpdate()
@@ -205,15 +200,15 @@ namespace Murgn
             ResetButtons();
             PressButton(i);
 
-            inMenu = true;
+            particleManager.inMenu = true;
         }
         
         private void BackButton(int i)
         {
             ResetButtons();
             PressButton(i);
-
-            inMenu = false;
+            particleManager.inMenu = false;
+            particleManager.Pause(false);
         }
         
         public void ResetButtons(bool resetInspectMode = true)
